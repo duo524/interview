@@ -10,6 +10,10 @@ type Rejected = (err: unknown) => unknown
 function isFunc(fn: (value: unknown) => unknown) {
     return typeof fn === 'function'
 }
+//判断一个值是不是可迭代对象
+function isIterator(val: any) {
+    return typeof val[Symbol.iterator] === 'function'
+}
 
 const resolvePromise = (promise: any, data: any, resolve: Fulfilled, reject: Rejected) => {
     if (data === promise) {
@@ -133,24 +137,92 @@ class MyPromise {
     catch(onRejected: Rejected): MyPromise {
         return this.then(undefined, onRejected)
     }
+
+    static resolve(value: unknown) {
+        if (value instanceof MyPromise) {
+            return value
+        }
+        return new MyPromise((resolve: Fulfilled) => {
+            resolve(value)
+        })
+    }
+
+    static reject(reason: unknown) {
+        return new MyPromise((resolve: Fulfilled, reject: Rejected) => {
+            reject(reason)
+        })
+    }
+
+    static all(values: any) {
+        if (!isIterator(values)) {
+            throw new TypeError('values must be an iterable object.')
+        }
+        return new MyPromise((resolve: Fulfilled, reject: Rejected) => {
+            debugger
+            //返回结果，all,values
+            const results: any = [];
+            //fulfilled 计数器
+            let count = 0;
+            //遍历顺序
+            let index = 0;
+            for (const value of values) {
+                //避免闭包问题
+                let resultIndex = index;
+                const p = MyPromise.resolve(value).then(value => {
+                    debugger
+                    //!在此保证最终返回的promise,在fulfilled时，所有的兑现值均按参数传递时的顺序
+                    results[resultIndex] = value;
+                    //fulfilled中统计次数，一旦count和传入的promises长度相等，就说明所有的promise均fulfilled了。
+                    count++
+                    if (count === index) {
+                        resolve(results)
+                    }
+                }, (reason) => {
+                    reject(reason)
+                });
+            }
+            if (index === 0) {
+                //表示没有遍历，遍历对象为空
+                resolve(results)
+            }
+        })
+    }
 }
 
 // 测试
-const p = new MyPromise((resolve: any, reject: any) => {
-    resolve(1)
-})
-p.then((res) => {
-    return new MyPromise((r: any) => {
-        r(2)
-    })
-}).then((res: any) => {
-    console.log(res)
-})
+// const p = new MyPromise((resolve: any, reject: any) => {
+//     resolve(1)
+// })
+// p.then((res) => {
+//     return new MyPromise((r: any) => {
+//         r(2)
+//     })
+// }).then((res: any) => {
+//     console.log(res)
+// })
 
-const p2 = new MyPromise((resolve: any, reject: any) => {
-    reject(2)
-})
-p2.catch((err) => {
-    console.log(err, 'err')
-})
+// const p2 = new MyPromise((resolve: any, reject: any) => {
+//     reject(2)
+// })
+// p2.catch((err) => {
+//     console.log(err, 'err')
+// })
 
+// MyPromise.resolve(3).then((res) => {
+//     console.log(res, 'res')
+// })
+
+// MyPromise.reject(4).catch((err) => {
+//     console.log(err, 'err')
+// })
+const a = MyPromise.resolve(3)
+
+const b = MyPromise.resolve(4)
+
+const c = MyPromise.resolve(5)
+
+const pArr = [a, b, c]
+
+MyPromise.all(pArr).then((res) => {
+    console.log(res, 'res')
+})

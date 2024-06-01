@@ -1,0 +1,20 @@
+{
+  "name": "interview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "1.手写promise(阉割版).js",
+  "scripts": {
+    "test": "tsc && node --inspect-brk 1.手写promise(阉割版)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duo524/interview.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duo524/interview/issues"
+  },
+  "homepage": "https://github.com/duo524/interview#readme"
+}
