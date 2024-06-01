@@ -4,7 +4,8 @@
   "description": "",
   "main": "1.手写promise(阉割版).js",
   "scripts": {
-    "test": "tsc && node --inspect-brk 1.手写promise(阉割版)"
+    "test": "tsc && node --inspect-brk",
+    "rm": "rm *.js 2>nul || del *.js"
   },
   "repository": {
     "type": "git",
