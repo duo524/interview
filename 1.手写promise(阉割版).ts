@@ -228,32 +228,17 @@ MyPromise.all(pArr).then((res) => {
 })
 
 
-function lengthOfLIS(nums: number[]): number {
-    const tails: number[] = [];
 
-    for (const num of nums) {
-        let left = 0, right = tails.length;
 
-        while (left < right) {
-            const mid = Math.floor((left + right) / 2);
-            if (tails[mid] < num) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
+// 实现promise首先需要传进来一个函数 这个函数接收两个参数一个relove 和 reject，然后需要准备五个变量，分别是promise的状态
+// relove的值和reject的值，和记录成功失败的回调函数的数组，然后将relove 和 reject当做参数传递给传进来的函数，
+// 在relove函数中将状态设置为成功将value设置成relove函数传进来的值，
+// 在reject函数中将状态设置为失败将reason设置成reject函数传进来的值，
+// 然后执行onFulfilledCallBacks和onRejectedCallBacks里的回调函数并把value和reason传递到函数中
 
-        if (left === tails.length) {
-            tails.push(num);
-        } else {
-            tails[left] = num;
-        }
-    }
+// 实现then方法首先返回一个promise，判断状态如果成功执行成功的函数，失败执行失败函数，如果是pending，将回调函数添加到
+// onFulfilledCallBacks和onRejectedCallBacks数组中
 
-    return tails.length;
-}
+// 在成功的函数中使用queueMicrotask将onFulfilled执行，并将value传递给onFulfilled，然后使用relove方法将结果传递出去，失败函数同理
+// 最后将这个promise返回
 
-// 使用示例
-const nums = [10, 9, 2, 5, 3, 7, 101, 18];
-const lisLength = lengthOfLIS(nums);
-console.log(lisLength); // 输出 4，最长递增子序列是 [2, 3, 7, 101]
